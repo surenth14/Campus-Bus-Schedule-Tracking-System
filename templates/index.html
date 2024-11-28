@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Time Predictor</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1 class="my-4">Bus Time Predictor</h1>
+
+        <form id="busForm">
+            <div class="form-group">
+                <label for="start_station">Start Station:</label>
+                <input type="text" class="form-control" id="start_station" placeholder="Enter Start Station">
+            </div>
+            <div class="form-group">
+                <label for="destination_station">Destination Station:</label>
+                <input type="text" class="form-control" id="destination_station" placeholder="Enter Destination">
+            </div>
+            <button type="submit" class="btn btn-primary">Get Bus Times</button>
+        </form>
+
+        <div id="busTimes" class="mt-4"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#busForm').on('submit', function(e) {
+                e.preventDefault();
+
+                let start_station = $('#start_station').val();
+                let destination_station = $('#destination_station').val();
+
+                $.ajax({
+                    url: '/predict',
+                    method: 'POST',
+                    data: {
+                        start_station: start_station,
+                        destination_station: destination_station
+                    },
+                    success: function(response) {
+                        if(response.error) {
+                            $('#busTimes').html(`<p>${response.error}</p>`);
+                        } else {
+                            let busTimesHtml = '<h4>Next Bus Times:</h4><ul>';
+                            response.forEach(function(time) {
+                                busTimesHtml += `<li>${time}</li>`;
+                            });
+                            busTimesHtml += '</ul>';
+                            $('#busTimes').html(busTimesHtml);
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
